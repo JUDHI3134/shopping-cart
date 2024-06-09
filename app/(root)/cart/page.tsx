@@ -1,16 +1,20 @@
 "use client"
 
+import PaypalButton from "@/components/Helper/PaypalButton"
 import { Button } from "@/components/ui/button"
-import { CartItem, addItem, removeItem } from "@/store/cartSlice"
+import { CartItem, addItem, crearCart, removeItem } from "@/store/cartSlice"
 import { Rootstate } from "@/store/store"
 import { useUser } from "@clerk/nextjs"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useDispatch, useSelector } from "react-redux"
 
 const Cart = () => {
 
     const dispatch = useDispatch();
+    //router
+    const router = useRouter();
 
     //get our cart items
     const items = useSelector((state:Rootstate) => state.cart.items)
@@ -36,6 +40,11 @@ const Cart = () => {
      dispatch(removeItem({id}))
   }
   
+  //handle payment success
+  const handleSuccess = (details:any)=>{
+    router.push("/success")
+    dispatch(crearCart())
+  }
 
   return (
     <div className="mt-8 min-h-[60vh]">
@@ -105,7 +114,12 @@ const Cart = () => {
                 )}
 
                 {user && (
+                    <>
+                    {/* optional paypal button...i have any paypal account so i use this button only  */}
                     <Button className="bg-orange-500 w-full">Paypal</Button>
+                    {/* original paypal button  */}
+                    <PaypalButton amount={totalPriceWithVat} onSuccess={handleSuccess} />
+                    </>
                 )}
             </div>
            </div>
